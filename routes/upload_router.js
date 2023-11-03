@@ -26,12 +26,12 @@ module.exports = function (upload) {
   router.post('/', upload.single('file'), async (req, res) => {
     if (!req.file) {
       setFlashMessage(req, 'error', 'No file selected');
-      return res.redirect('/');
+      return res.redirect('/?uploadSuccess=false');
     }
 
     if (!['text/csv', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'].includes(req.file.mimetype)) {
       setFlashMessage(req, 'error', 'Invalid file format. Please upload a CSV or Excel spreadsheet file.');
-      return res.redirect('/');
+      return res.redirect('/?uploadSuccess=false');
     }
 
     if (req.file.mimetype === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {      
