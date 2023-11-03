@@ -3,17 +3,13 @@ const formatter = require('./mySqlFormatter');
 
 const xlsxToEmployeeHours = () => {
     const INITIAL_VALUE_ROW = 2;
-    const expectedColumns = [
-        'Co', 'ID', 'Name', 'Department', 'Hire Date', 'Period Begin', 'Period End',
-        'Check Date', 'E-2 Reg Hrs', 'E-3 OT Hrs', 'E-WALI WALI', 'E-WALISal WALISal'
-    ];
-    const columnDataTypes = {
+    const COLUMN_TYPES = {
         'Co': 'number', 'ID': 'number', 'Name': 'string', 'Department': 'string',
         'Hire Date': 'date', 'Period Begin': 'date', 'Period End': 'date',
         'Check Date': 'date', 'E-2 Reg Hrs': 'number', 'E-3 OT Hrs': 'number',
         'E-WALI WALI': 'number', 'E-WALISal WALISal': 'number'
     };
-    const header_mapping = {
+    const DISPLAY_MAPPING = {
         'E-2 Reg Hrs': 'E-2RegHours',
         'E-3 OT Hrs': 'E-3OTHours',
         'E-WALI WALI': 'E-WALIWALI',
@@ -132,6 +128,8 @@ const xlsxToEmployeeHours = () => {
         const rows = fileBuffer ? getRows(fileBuffer) : TEST_ROWS;
         const mergedOriginalHeader = getMergedHeader(rows);
 
+        const expectedColumns = Object.keys(COLUMN_TYPES);
+
         // Process the remaining rows using the merged header
         for (let i = INITIAL_VALUE_ROW; i < rows.length; i++) { // Starting from row index 2 since the first two rows are header rows
             const rowData = rows[i];
@@ -141,9 +139,9 @@ const xlsxToEmployeeHours = () => {
                 if (!expectedColumns.includes(columnName)) {
                     continue;
                 }
-                const dataType = columnDataTypes[columnName];
+                const dataType = COLUMN_TYPES[columnName];
                 const value = sanitizeValue(rowData[j], dataType);  // Sanitize the cell value
-                const MySqlColumnName = header_mapping[columnName];
+                const MySqlColumnName = DISPLAY_MAPPING[columnName];
 
                 if (value === null || value === undefined || value === '' || value === '-') {
                     entry[MySqlColumnName] = null;
@@ -157,9 +155,9 @@ const xlsxToEmployeeHours = () => {
             }
 
             expectedColumns.forEach(cname => {
-                const mySqlName = header_mapping[cname]
+                const mySqlName = DISPLAY_MAPPING[cname]
                 if (!Object.keys(entry).includes(mySqlName)) {
-                    entry[header_mapping[cname]] = null
+                    entry[DISPLAY_MAPPING[cname]] = null
                 }
             })
 
